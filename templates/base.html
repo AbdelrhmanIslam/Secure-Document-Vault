@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Secure Document Vault{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}vault-theme{% endblock %}">
+    <div class="shell">
+        <header class="topbar">
+            <div class="topbar-glow" aria-hidden="true"></div>
+            <div class="brand">
+                <span class="eyebrow">Secure Workspace</span>
+                <h1>Secure Document Vault</h1>
+                <p>Protected storage, verification, and role-based review workflows.</p>
+            </div>
+            <nav class="nav">
+                {% if g.current_user %}
+                    <a href="{{ url_for('documents.dashboard') }}" class="{% if request.endpoint == 'documents.dashboard' %}active{% else %}secondary{% endif %}">Dashboard</a>
+                    <a href="{{ url_for('documents.upload') }}" class="{% if request.endpoint == 'documents.upload' %}active{% else %}secondary{% endif %}">Upload</a>
+                    {% if g.current_user.can_review_documents() %}
+                        <a href="{{ url_for('documents.manager_dashboard') }}" class="{% if request.endpoint == 'documents.manager_dashboard' %}active{% else %}secondary{% endif %}">Review Queue</a>
+                    {% endif %}
+                    {% if g.current_user.can_manage_users() %}
+                        <a href="{{ url_for('documents.admin_panel') }}" class="{% if request.endpoint == 'documents.admin_panel' %}active{% else %}secondary{% endif %}">Admin Panel</a>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('auth.logout') }}" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="danger">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="{% if request.endpoint == 'auth.login' %}active{% else %}secondary{% endif %}">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="{% if request.endpoint == 'auth.register' %}active{% else %}secondary{% endif %}">Create Account</a>
+                {% endif %}
+            </nav>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-stack">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

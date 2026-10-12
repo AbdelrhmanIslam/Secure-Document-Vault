@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Set Up 2FA | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/setup_2fa.css') }}">{% endblock %}
+{% block content %}
+<section class="panel auth-card">
+    <div class="hero">
+        <h1>Finish two-factor setup</h1>
+        <p>Scan the QR code in your authenticator app, then enter the generated 6-digit code to activate vault access.</p>
+    </div>
+
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+
+    <div class="stack">
+        <div class="card qr-card">
+            <img src="data:image/png;base64,{{ qr_code }}" alt="2FA QR code" class="qr-image">
+        </div>
+        <div class="card">
+            <strong>Account</strong>
+            <p>{{ email }}</p>
+            <strong>Manual secret</strong>
+            <code>{{ secret }}</code>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.setup_2fa_again') }}" class="stack push-top-sm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+            <label for="code">Authenticator code</label>
+            <input id="code" type="text" name="code" placeholder="123456" pattern="[0-9]{6}" maxlength="6" required>
+        </div>
+        <button type="submit">Enable 2FA</button>
+    </form>
+</section>
+{% endblock %}

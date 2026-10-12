@@ -1,0 +1,15 @@
+.table-wrap {
+    margin-top: 0.5rem;
+}
+
+.table-wrap select {
+    min-width: 140px;
+}
+
+.table-wrap td form.stack {
+    min-width: 170px;
+}
+
+.table-wrap td:last-child .inline-actions {
+    min-width: 180px;
+}

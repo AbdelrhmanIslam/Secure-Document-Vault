@@ -1,0 +1,11 @@
+Single-database configuration for Flask-Migrate.
+
+Fresh setup:
+1. Install dependencies from requirements.txt.
+2. Run `flask db upgrade`.
+3. Run `flask create-admin` to bootstrap the first administrator account.
+
+Upgrading a legacy database created before migrations:
+1. Back up the existing SQLite database file.
+2. Run `flask db stamp 20260510_01`.
+3. Run `flask db upgrade`.

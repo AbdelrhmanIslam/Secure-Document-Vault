@@ -1,0 +1,25 @@
+.auth-card {
+    max-width: 700px;
+}
+
+.auth-card .hero {
+    text-align: center;
+}
+
+.qr-card {
+    text-align: center;
+}
+
+.qr-image {
+    filter: drop-shadow(0 18px 28px rgba(36, 79, 75, 0.12));
+}
+
+.push-top-sm {
+    margin-top: 1.25rem;
+}
+
+.auth-card code {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+}

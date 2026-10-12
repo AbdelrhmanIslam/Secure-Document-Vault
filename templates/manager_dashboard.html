@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Review Queue | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/manager_dashboard.css') }}">{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="hero">
+        <h1>Manager review dashboard</h1>
+        <p>Review uploaded documents, inspect metadata, and validate integrity and signature status across the vault.</p>
+    </div>
+
+    <div class="grid stats">
+        <div class="stat-card">
+            <span class="muted">Documents queued</span>
+            <strong>{{ documents|length }}</strong>
+        </div>
+        <div class="stat-card">
+            <span class="muted">Integrity passing</span>
+            <strong>{{ verified_count }}</strong>
+        </div>
+    </div>
+
+    <div class="table-wrap review-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Document</th>
+                    <th>Uploaded By</th>
+                    <th>Uploaded</th>
+                    <th>Status</th>
+                    <th>Hash</th>
+                    <th>Signature</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for document in documents %}
+                    {% set status = document_statuses[document.id] %}
+                    <tr>
+                        <td>
+                            <strong>{{ document.original_filename }}</strong><br>
+                            <span class="muted">{{ document.file_size }} bytes</span>
+                        </td>
+                        <td>{{ document.uploader.username }}<br><span class="muted">{{ document.uploader.email }}</span></td>
+                        <td>{{ document.upload_date.strftime('%Y-%m-%d %H:%M UTC') if document.upload_date else 'Unknown' }}</td>
+                        <td>
+                            {% if document.status == 'Approved' %}
+                                <span class="pill ok">Approved</span>
+                            {% elif document.status == 'Rejected' %}
+                                <span class="pill danger">Rejected</span>
+                            {% else %}
+                                <span class="pill">Pending</span>
+                            {% endif %}
+                            {% if document.reviewed_by %}
+                                <br><small class="muted">by {{ document.reviewed_by.username }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if status['hash_matches'] %}
+                                <span class="pill ok">SHA-256 verified</span>
+                            {% elif status['error'] %}
+                                <span class="pill danger">Verification error</span>
+                            {% else %}
+                                <span class="pill danger">Hash mismatch</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if status['signature_valid'] %}
+                                <span class="pill ok">Signature valid</span>
+                            {% elif status['error'] %}
+                                <span class="pill danger">Unavailable</span>
+                            {% else %}
+                                <span class="pill danger">Signature invalid</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="inline-actions">
+                                <a href="{{ url_for('documents.metadata', doc_id=document.id) }}" class="button secondary">Metadata</a>
+                                <a href="{{ url_for('documents.verify', doc_id=document.id) }}" class="button secondary">Verify</a>
+                                {% if document.status == 'Pending' %}
+                                <form method="POST" action="{{ url_for('documents.update_status', doc_id=document.id) }}" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="status" value="Approved">
+                                    <button type="submit" class="button">Approve</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('documents.update_status', doc_id=document.id) }}" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="status" value="Rejected">
+                                    <button type="submit" class="button danger">Reject</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7"><span class="muted">No uploaded documents are available for review.</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

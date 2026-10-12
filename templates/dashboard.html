@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="hero">
+        <h1>Vault dashboard</h1>
+        <p>Welcome back, <strong>{{ user.username }}</strong>. Your role is <strong>{{ user.role }}</strong>{% if not user.is_active %} and the account is currently disabled{% endif %}.</p>
+    </div>
+
+    <div class="grid stats">
+        <div class="stat-card">
+            <span class="muted">Documents shown</span>
+            <strong>{{ documents|length }}</strong>
+        </div>
+        <div class="stat-card">
+            <span class="muted">Role</span>
+            <strong>{{ user.role }}</strong>
+        </div>
+        <div class="stat-card">
+            <span class="muted">Review access</span>
+            <strong>{{ 'Enabled' if can_review_documents else 'Own files only' }}</strong>
+        </div>
+    </div>
+
+    <div class="inline-actions dashboard-actions">
+        <a href="{{ url_for('documents.upload') }}" class="button">Upload document</a>
+        {% if can_review_documents %}
+            <a href="{{ url_for('documents.manager_dashboard') }}" class="button secondary">Open review queue</a>
+        {% endif %}
+        {% if can_manage_users %}
+            <a href="{{ url_for('documents.admin_panel') }}" class="button secondary">Manage users</a>
+        {% endif %}
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Document</th>
+                    <th>Uploaded</th>
+                    <th>Size</th>
+                    <th>Status</th>
+                    {% if user.role == 'Admin' %}
+                        <th>Uploaded By</th>
+                    {% endif %}
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                    <tr>
+                        <td>
+                            <strong>{{ doc.original_filename }}</strong><br>
+                            <span class="muted">Stored as {{ doc.filename }}</span>
+                        </td>
+                        <td>{{ doc.upload_date.strftime('%Y-%m-%d %H:%M UTC') if doc.upload_date else 'Unknown' }}</td>
+                        <td>{{ doc.file_size }} bytes</td>
+                        <td>
+                            {% if doc.status == 'Approved' %}
+                                <span class="pill ok">Approved</span>
+                            {% elif doc.status == 'Rejected' %}
+                                <span class="pill danger">Rejected</span>
+                            {% else %}
+                                <span class="pill">Pending</span>
+                            {% endif %}
+                        </td>
+                        {% if user.role == 'Admin' %}
+                            <td>{{ doc.uploader.username }}<br><span class="muted">{{ doc.uploader.email }}</span></td>
+                        {% endif %}
+                        <td>
+                            <div class="inline-actions">
+                                <a href="{{ url_for('documents.metadata', doc_id=doc.id) }}" class="button secondary">Metadata</a>
+                                <a href="{{ url_for('documents.verify', doc_id=doc.id) }}" class="button secondary">Verify</a>
+                                {% if user.role == 'Admin' or user.id == doc.uploader_id %}
+                                    <a href="{{ url_for('documents.download', doc_id=doc.id) }}" class="button secondary">Download</a>
+                                {% endif %}
+                                {% if user.role == 'Admin' or user.id == doc.uploader_id %}
+                                    <form method="POST" action="{{ url_for('documents.delete', doc_id=doc.id) }}" class="inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="danger">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="{{ 6 if user.role == 'Admin' else 5 }}">
+                            <span class="muted">No documents available yet.</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

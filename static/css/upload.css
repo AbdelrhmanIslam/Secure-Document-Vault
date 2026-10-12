@@ -1,0 +1,19 @@
+.upload-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+}
+
+.upload-layout .panel {
+    min-height: 100%;
+}
+
+.upload-layout aside .card strong {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--primary);
+}
+
+@media (max-width: 860px) {
+    .upload-layout {
+        grid-template-columns: 1fr;
+    }
+}

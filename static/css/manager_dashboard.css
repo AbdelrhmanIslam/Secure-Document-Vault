@@ -1,0 +1,11 @@
+.review-table {
+    margin-top: 1.5rem;
+}
+
+.review-table .pill {
+    white-space: nowrap;
+}
+
+.review-table td:last-child .button {
+    min-width: 100px;
+}

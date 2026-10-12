@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Verification | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/verify.css') }}">{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="hero">
+        <h1>Integrity verification</h1>
+        <p>Live verification results for <strong>{{ document.original_filename }}</strong>.</p>
+    </div>
+
+    {% if verification['error'] %}
+        <div class="flash error">{{ verification['error'] }}</div>
+    {% endif %}
+
+    <div class="grid verification-grid">
+        <div class="card">
+            <strong>Stored SHA-256</strong>
+            <code>{{ verification['stored_hash'] }}</code>
+        </div>
+        <div class="card">
+            <strong>Current SHA-256</strong>
+            <code>{{ verification['current_hash'] or 'Unavailable' }}</code>
+        </div>
+        <div class="card">
+            <strong>Hash comparison</strong>
+            {% if verification['hash_matches'] %}
+                <span class="pill ok">Match</span>
+            {% elif verification['error'] %}
+                <span class="pill danger">Unavailable</span>
+            {% else %}
+                <span class="pill danger">Mismatch</span>
+            {% endif %}
+        </div>
+        <div class="card">
+            <strong>Digital signature</strong>
+            {% if verification['signature_valid'] %}
+                <span class="pill ok">Valid</span>
+            {% elif verification['error'] %}
+                <span class="pill danger">Unavailable</span>
+            {% else %}
+                <span class="pill danger">Invalid</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card section-lift">
+        <strong>Overall result</strong>
+        <p>
+            {% if verification['integrity_ok'] %}
+                The stored file still matches its recorded SHA-256 hash and RSA signature.
+            {% elif verification['error'] %}
+                Verification could not complete because the encrypted file was unavailable or unreadable.
+            {% else %}
+                The file failed integrity verification. Review the hash and signature status before trusting this document.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="inline-actions inline-actions-spaced">
+        <a href="{{ url_for('documents.metadata', doc_id=document.id) }}" class="button secondary">View metadata</a>
+        <a href="{{ url_for('documents.dashboard') }}" class="button secondary">Back to dashboard</a>
+    </div>
+</section>
+{% endblock %}

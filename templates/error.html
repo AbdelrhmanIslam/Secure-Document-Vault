@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/error.css') }}">{% endblock %}
+{% block content %}
+<section class="panel auth-card">
+    <div class="hero">
+        <h1>{{ title }}</h1>
+        <p>{{ message }}</p>
+    </div>
+    <div class="inline-actions">
+        <a href="{{ url_for('auth.login') }}" class="button secondary">Return to login</a>
+        <a href="{{ url_for('documents.dashboard') }}" class="button">Go to dashboard</a>
+    </div>
+</section>
+{% endblock %}

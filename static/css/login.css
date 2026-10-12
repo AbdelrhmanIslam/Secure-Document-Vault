@@ -1,0 +1,17 @@
+
+.auth-card .hero p {
+    max-width: 38ch;
+}
+
+.auth-links {
+    margin-top: 1.25rem;
+}
+
+.auth-links .button {
+    width: 100%;
+}
+
+.auth-footer {
+    margin-top: 1.25rem;
+    text-align: center;
+}

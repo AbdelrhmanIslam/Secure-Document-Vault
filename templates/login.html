@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Login | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">{% endblock %}
+{% block content %}
+<section class="panel auth-card">
+    <div class="hero">
+        <h1>Sign in to the vault</h1>
+        <p>Use your password plus 2FA, or continue with your configured OAuth provider.</p>
+    </div>
+
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+
+    <form method="POST" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit">Continue</button>
+    </form>
+
+    <div class="stack auth-links">
+        <a class="button secondary" href="{{ url_for('auth.login_github') }}">Continue with GitHub</a>
+        <a class="button secondary" href="{{ url_for('auth.login_google') }}">Continue with Google</a>
+    </div>
+
+    <p class="muted auth-footer">
+        Need an account? <a href="{{ url_for('auth.register') }}">Register here</a>.
+    </p>
+</section>
+{% endblock %}

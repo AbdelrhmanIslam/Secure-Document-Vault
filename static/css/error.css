@@ -1,0 +1,10 @@
+.auth-card {
+    text-align: center;
+    background:
+        radial-gradient(circle at top, rgba(159, 61, 53, 0.08), transparent 26%),
+        linear-gradient(180deg, rgba(255, 252, 248, 0.96), rgba(255, 245, 241, 0.92));
+}
+
+.auth-card .inline-actions {
+    justify-content: center;
+}

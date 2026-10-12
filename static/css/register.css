@@ -1,0 +1,13 @@
+
+.auth-card .hero p {
+    max-width: 42ch;
+}
+
+.auth-footer {
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+.auth-card button {
+    min-width: 160px;
+}

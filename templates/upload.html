@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Upload | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="hero">
+        <h1>Upload a protected document</h1>
+        <p>Files are encrypted with Fernet, hashed with SHA-256, and signed with RSA before they are stored.</p>
+    </div>
+
+    <div class="grid upload-layout">
+        <form method="POST" enctype="multipart/form-data" class="panel panel-tight stack">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+            <div class="field">
+                <label for="file">Document file</label>
+                <input id="file" type="file" name="file" required>
+            </div>
+            <button type="submit">Upload and Protect</button>
+        </form>
+
+        <aside class="panel panel-tight stack">
+            <div class="card">
+                <strong>Allowed types</strong>
+                <p>{{ allowed_extensions }}</p>
+            </div>
+            <div class="card">
+                <strong>Size limit</strong>
+                <p>{{ config.MAX_CONTENT_LENGTH }} bytes maximum per file</p>
+            </div>
+            <div class="card">
+                <strong>Access rule</strong>
+                <p>Users manage their own uploads. Managers review metadata and verification status. Admins have full vault visibility.</p>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

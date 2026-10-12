@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="hero">
+        <h1>Administrator control center</h1>
+        <p>Manage account status, role assignments, and user lifecycle controls without affecting the vault's encryption and verification features.</p>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>2FA</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in users %}
+                    <tr>
+                        <td>
+                            <strong>{{ account.username }}</strong><br>
+                            <span class="muted">{{ account.email }}</span>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('documents.update_user_role', user_id=account.id) }}" class="stack">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <select name="role" aria-label="Role for {{ account.email }}">
+                                    {% for role in roles %}
+                                        <option value="{{ role }}" {% if account.role == role %}selected{% endif %}>{{ role }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="secondary">Update role</button>
+                            </form>
+                        </td>
+                        <td>
+                            <span class="pill {{ 'ok' if account.is_active else 'danger' }}">
+                                {{ 'Active' if account.is_active else 'Disabled' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="pill {{ 'ok' if account.twofa_enabled else 'warn' }}">
+                                {{ 'Enabled' if account.twofa_enabled else 'Pending setup' }}
+                            </span>
+                        </td>
+                        <td>{{ account.created_at.strftime('%Y-%m-%d %H:%M UTC') if account.created_at else 'Unknown' }}</td>
+                        <td>
+                            <div class="inline-actions">
+                                <form method="POST" action="{{ url_for('documents.update_user_status', user_id=account.id) }}" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="is_active" value="{{ 'false' if account.is_active else 'true' }}">
+                                    <button type="submit" class="secondary">
+                                        {{ 'Disable' if account.is_active else 'Enable' }}
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('documents.delete_user', user_id=account.id) }}" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="danger">Delete user</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6"><span class="muted">No users found.</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

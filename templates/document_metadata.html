@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Document Metadata | Secure Document Vault{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/document_metadata.css') }}">{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="hero">
+        <h1>Document metadata</h1>
+        <p>Stored properties and current integrity indicators for <strong>{{ document.original_filename }}</strong>.</p>
+    </div>
+
+    {% if verification['error'] %}
+        <div class="flash error">{{ verification['error'] }}</div>
+    {% endif %}
+
+    <div class="key-value">
+        <div class="card">
+            <strong>File name</strong>
+            <span>{{ document.original_filename }}</span>
+        </div>
+        <div class="card">
+            <strong>Upload date</strong>
+            <span>{{ document.upload_date.strftime('%Y-%m-%d %H:%M UTC') if document.upload_date else 'Unknown' }}</span>
+        </div>
+        <div class="card">
+            <strong>File size</strong>
+            <span>{{ document.file_size }} bytes</span>
+        </div>
+        <div class="card">
+            <strong>Uploaded by</strong>
+            <span>{{ document.uploader.username }} ({{ document.uploader.email }})</span>
+        </div>
+        <div class="card">
+            <strong>SHA-256 hash</strong>
+            <code>{{ document.file_hash }}</code>
+        </div>
+        <div class="card">
+            <strong>Signature status</strong>
+            {% if verification['signature_valid'] %}
+                <span class="pill ok">Valid</span>
+            {% elif verification['error'] %}
+                <span class="pill danger">Unavailable</span>
+            {% else %}
+                <span class="pill danger">Invalid</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid metadata-grid-wide section-lift">
+        <div class="card">
+            <strong>Current SHA-256</strong>
+            <code>{{ verification['current_hash'] or 'Unavailable' }}</code>
+        </div>
+        <div class="card">
+            <strong>Integrity result</strong>
+            {% if verification['integrity_ok'] %}
+                <span class="pill ok">Hash and signature verified</span>
+            {% elif verification['error'] %}
+                <span class="pill danger">Verification unavailable</span>
+            {% else %}
+                <span class="pill danger">Verification failed</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="inline-actions inline-actions-spaced">
+        <a href="{{ url_for('documents.verify', doc_id=document.id) }}" class="button">Open verification page</a>
+        <a href="{{ url_for('documents.dashboard') }}" class="button secondary">Back to dashboard</a>
+    </div>
+</section>
+{% endblock %}

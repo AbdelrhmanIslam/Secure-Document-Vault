@@ -1,0 +1,16 @@
+.dashboard-actions {
+    margin: 1.5rem 0;
+}
+
+.dashboard-actions .button {
+    min-width: 160px;
+}
+
+.table-wrap td:first-child strong {
+    color: var(--secondary-strong);
+}
+
+.table-wrap td:last-child .button,
+.table-wrap td:last-child button {
+    min-width: 108px;
+}
